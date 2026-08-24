@@ -9,4 +9,4 @@ count(distinct(InvoiceId)) as Total from Invoice
 union
 
 select "Tracks" as NumberOf, 
-count(distinct(TrackId)) as Total from Track
+count(distinct(TrackId)) as Total from Trackd
