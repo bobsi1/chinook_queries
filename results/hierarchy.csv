@@ -1,0 +1,9 @@
+"EmployeeId","Name","Path","NumberOfCustomers"
+1,Andrew Adams,Andrew Adams,59
+2,Nancy Edwards,Andrew Adams -> Nancy Edwards,59
+3,Jane Peacock,Andrew Adams -> Nancy Edwards -> Jane Peacock,21
+4,Margaret Park,Andrew Adams -> Nancy Edwards -> Margaret Park,20
+5,Steve Johnson,Andrew Adams -> Nancy Edwards -> Steve Johnson,18
+6,Michael Mitchell,Andrew Adams -> Michael Mitchell,0
+7,Robert King,Andrew Adams -> Michael Mitchell -> Robert King,0
+8,Laura Callahan,Andrew Adams -> Michael Mitchell -> Laura Callahan,0

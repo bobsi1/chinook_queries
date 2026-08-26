@@ -16,4 +16,3 @@ round((sum(Total) over (order by Total desc) / (select sum(UnitPrice * Quantity)
 
 from q1 
 order by Total desc
-limit 10
