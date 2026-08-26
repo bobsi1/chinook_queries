@@ -1,3 +1,16 @@
+# Chinook SQL Analytics
+
+A set of SQL queries answering business questions on the [Chinook database](https://github.com/lerocha/chinook-database) — a sample dataset simulating a digital media store (customers, invoices, tracks, artists, and employees).
+
+This project demonstrates SQL for data analysis (multi-table joins, CTEs, window functions).
+
+**Database schema:** see [schema.png](schema.png) for table structure and relationships.
+
+## Queries
+
+Each query below follows the same format: business question → SQL → result → interpretation.
+
+
 # 1. Overview  
 ### - Total number of Customers, Invoices and Tracks    
 **Query:**   
@@ -110,7 +123,7 @@ ORDER BY c.CustomerId, i.InvoiceDate
 |Leonie Köhler|196|2023-05-19 00:00:00|1.98|8.91| -6.93           |
 
 Result of this query show each customer Invoices trend by comparing each invoice with the previous one.
-In the example we can see that the second Leonie Köhler's invoice was bigger than the first on $11.88, but the next invoices prices declined.
+In the example we can see that the second Leonie Köhler's invoice was bigger than the first by $11.88, but the next invoices prices declined.
 
 # 4. Top-10 Artists with cumulative percent of revenue  
 **Query:**   
@@ -154,3 +167,47 @@ The top-10 artists generate 30.98% of total
 revenue, which demonstrates that in this dataset, 
 sales are distributed more or less evenly and do not 
 fit the Pareto principle (80/20).
+
+# 5. Hierarchy with number of customers  
+**Query:**   
+```sql
+with recursive employees as (
+select e1.EmployeeId , 
+e1.FirstName || ' ' || e1.LastName  as Name, 
+e1.ReportsTo as ManagerId,
+e1.FirstName || ' ' || e1.LastName as Path
+from Employee e1
+where ReportsTo is  null
+
+union all
+
+select  e2.EmployeeId , 
+e2.FirstName || ' ' || e2.LastName as Name, 
+e2.ReportsTo  ,
+employees.Path || ' -> ' || e2.FirstName || ' ' || e2.LastName as Path
+from Employee e2
+join employees on employees.EmployeeId = e2.ReportsTo
+
+)
+select employees.EmployeeId, employees.Name, employees.Path, count(distinct(CustomerId)) as NumberOfCustomers
+from employees
+left join employees em2 on em2.Path like employees.Path || '%'
+left join Customer on em2.EmployeeId = Customer.SupportRepId
+group by  employees.EmployeeId, employees.Name, employees.Path
+
+```
+**Result:** 
+
+|EmployeeId|Name|Path|NumberOfCustomers|
+|----------|----|----|-----------------|
+|1|Andrew Adams|Andrew Adams|59|
+|2|Nancy Edwards|Andrew Adams -> Nancy Edwards|59|
+|3|Jane Peacock|Andrew Adams -> Nancy Edwards -> Jane Peacock|21|
+|4|Margaret Park|Andrew Adams -> Nancy Edwards -> Margaret Park|20|
+|5|Steve Johnson|Andrew Adams -> Nancy Edwards -> Steve Johnson|18|
+|6|Michael Mitchell|Andrew Adams -> Michael Mitchell|0|
+|7|Robert King|Andrew Adams -> Michael Mitchell -> Robert King|0|
+|8|Laura Callahan|Andrew Adams -> Michael Mitchell -> Laura Callahan|0|
+
+This query's result demonstrates employees hierarchy and each employee's number of customers (total, including subordinates customers).
+For example, Andrew Adams covers all 59 customers company-wide, while Steve Johnson himself covers only 18 
